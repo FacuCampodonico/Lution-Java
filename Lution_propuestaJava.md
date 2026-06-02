@@ -1,5 +1,3 @@
-# CanchaLibre
-
 ## Propuesta de proyecto | Asignatura: Java | UTN Rosario | 2026
 
 1. ## **Integrantes**
@@ -7,6 +5,7 @@
 | Legajo | Apellido y nombres |
 
 | 54913 | Campodonico Facundo |
+
 | 54812 | Sopo Juan Esteban |
 
 ---
