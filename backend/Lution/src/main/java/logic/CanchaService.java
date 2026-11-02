@@ -16,6 +16,10 @@ public class CanchaService {
 		return dataCancha.getAll();
 	}
 
+	public LinkedList<Cancha> listar(Integer idTipoCancha) {
+		return dataCancha.getAll(idTipoCancha);
+	}
+
 	public Cancha buscarPorId(int idCancha) {
 		return dataCancha.getById(idCancha);
 	}

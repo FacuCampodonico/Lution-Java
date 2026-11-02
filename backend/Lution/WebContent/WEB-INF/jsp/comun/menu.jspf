@@ -12,6 +12,7 @@
             <% } else { %>
                 <a href="reserva" class="btn btn-link">Mis reservas</a>
             <% } %>
+            <a href="disponibilidad" class="btn btn-link">Horarios disponibles</a>
         </div>
         <div>
             <span><%= usuarioSesion.getNombre() %> <%= usuarioSesion.getApellido() %> (<%= usuarioSesion.getRol() %>)</span>

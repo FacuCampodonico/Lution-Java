@@ -20,7 +20,7 @@ public class LoginServlet extends HttpServlet {
 
 		if (usuario != null) {
 
-			response.sendRedirect("Administrador".equals(usuario.getRol()) ? "cancha" : "reserva");
+			response.sendRedirect("Administrador".equals(usuario.getRol()) ? "cancha" : "disponibilidad");
 
 		} else {
 

@@ -3,9 +3,12 @@ package logic;
 import data.DataReserva;
 import entities.Cancha;
 import entities.Horario;
+import entities.Mantenimiento;
 import entities.Reserva;
+import entities.TipoCancha;
 import entities.Usuario;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.LinkedList;
 
 public class ReservaService {
@@ -13,6 +16,8 @@ public class ReservaService {
 	private DataReserva dataReserva = new DataReserva();
 	private CanchaService canchaService = new CanchaService();
 	private UsuarioService usuarioService = new UsuarioService();
+	private MantenimientoService mantenimientoService = new MantenimientoService();
+	private TipoCanchaService tipoCanchaService = new TipoCanchaService();
 
 	public LinkedList<Reserva> listar() {
 		return dataReserva.getAll();
@@ -24,6 +29,10 @@ public class ReservaService {
 
 	public LinkedList<Cancha> listarCanchas() {
 		return canchaService.listar();
+	}
+
+	public LinkedList<TipoCancha> listarTiposCancha() {
+		return tipoCanchaService.listar();
 	}
 
 	public Reserva reservar(int idUsuario, int idCancha, LocalDate fecha, int horaInicio) {
@@ -41,7 +50,7 @@ public class ReservaService {
 		}
 
 		int horaFin = horaInicio + cancha.getHorario().getIntervaloHoras();
-		String motivo = motivoNoDisponible(cancha, fecha, horaInicio, horaFin, dataReserva.getByFecha(fecha));
+		String motivo = motivoNoDisponible(cancha, fecha, horaInicio, horaFin, dataReserva.getByFecha(fecha), mantenimientoService.listarPorFecha(fecha));
 		if (motivo != null) {
 			throw new IllegalArgumentException(motivo);
 		}
@@ -49,7 +58,26 @@ public class ReservaService {
 		return dataReserva.setReserva(new Reserva(cliente, cancha, fecha, horaInicio, horaFin));
 	}
 
-	private String motivoNoDisponible(Cancha cancha, LocalDate fecha, int horaInicio, int horaFin, LinkedList<Reserva> reservasDelDia) {
+	public LinkedList<Reserva> buscarDisponibles(LocalDate fecha, Integer idTipoCancha) {
+
+		LinkedList<Reserva> turnos = new LinkedList<>();
+		LinkedList<Reserva> reservasDelDia = dataReserva.getByFecha(fecha);
+		LinkedList<Mantenimiento> mantenimientosDelDia = mantenimientoService.listarPorFecha(fecha);
+
+		for (Cancha cancha : canchaService.listar(idTipoCancha)) {
+			Horario h = cancha.getHorario();
+			for (int ini = h.getHoraInicio(); ini + h.getIntervaloHoras() <= h.getHoraFin(); ini += h.getIntervaloHoras()) {
+				int fin = ini + h.getIntervaloHoras();
+				if (motivoNoDisponible(cancha, fecha, ini, fin, reservasDelDia, mantenimientosDelDia) == null) {
+					turnos.add(new Reserva(null, cancha, fecha, ini, fin));
+				}
+			}
+		}
+
+		return turnos;
+	}
+
+	private String motivoNoDisponible(Cancha cancha, LocalDate fecha, int horaInicio, int horaFin, LinkedList<Reserva> reservasDelDia, LinkedList<Mantenimiento> mantenimientosDelDia) {
 		Horario h = cancha.getHorario();
 
 		if (fecha.isBefore(LocalDate.now())) {
@@ -62,6 +90,14 @@ public class ReservaService {
 			if (r.getCancha().getIdCancha() == cancha.getIdCancha() && seSolapan(horaInicio, horaFin, r.getHoraInicio(), r.getHoraFin())) {
 				return "La cancha ya está reservada en ese horario.";
 			}
+		}
+		for (Mantenimiento m : mantenimientosDelDia) {
+			if (m.getCancha().getIdCancha() == cancha.getIdCancha() && seSolapan(horaInicio, horaFin, m.getHoraInicio(), m.getHoraFin())) {
+				return "La cancha está en mantenimiento en ese horario.";
+			}
+		}
+		if (fecha.equals(LocalDate.now()) && horaInicio <= LocalTime.now().getHour()) {
+			return "El turno ya comenzó.";
 		}
 		return null;
 	}

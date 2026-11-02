@@ -25,7 +25,7 @@ public class LoginProcesar extends HttpServlet {
 			Usuario usuario = usuarioService.autenticar(dni, password);
 			request.getSession().setAttribute("usuario", usuario);
 
-			response.sendRedirect("Administrador".equals(usuario.getRol()) ? "cancha" : "reserva");
+			response.sendRedirect("Administrador".equals(usuario.getRol()) ? "cancha" : "disponibilidad");
 
 		} catch (RuntimeException e) {
 

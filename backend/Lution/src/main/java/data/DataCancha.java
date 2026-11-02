@@ -13,19 +13,30 @@ import entities.TipoCancha;
 public class DataCancha {
 
 	public LinkedList<Cancha> getAll() {
-		Statement stmt = null;
+		return getAll(null);
+	}
+
+	public LinkedList<Cancha> getAll(Integer idTipoCancha) {
+		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		LinkedList<Cancha> canchas = new LinkedList<>();
 
 		try {
-			stmt = DbConnector.getInstancia().getConn().createStatement();
-			rs = stmt.executeQuery(
-					"SELECT c.idCancha, c.numero, t.idTipoCancha, t.nombre, t.descripcion, t.cantMaxJugadores, t.precio, "
+			String sql = "SELECT c.idCancha, c.numero, t.idTipoCancha, t.nombre, t.descripcion, t.cantMaxJugadores, t.precio, "
 					+ "h.idHorario, h.horaInicio, h.horaFin, h.intervaloHoras "
 					+ "FROM cancha c "
 					+ "JOIN tipo_cancha t ON t.idTipoCancha = c.idTipoCancha "
-					+ "JOIN horario h ON h.idHorario = c.idHorario "
-					+ "ORDER BY t.nombre, c.numero ");
+					+ "JOIN horario h ON h.idHorario = c.idHorario ";
+			if (idTipoCancha != null) {
+				sql += "WHERE c.idTipoCancha = ? ";
+			}
+			sql += "ORDER BY t.nombre, c.numero ";
+
+			stmt = DbConnector.getInstancia().getConn().prepareStatement(sql);
+			if (idTipoCancha != null) {
+				stmt.setInt(1, idTipoCancha);
+			}
+			rs = stmt.executeQuery();
 
 			if (rs != null) {
 				while (rs.next()) {
