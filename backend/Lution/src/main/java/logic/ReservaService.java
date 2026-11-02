@@ -18,8 +18,8 @@ public class ReservaService {
 		return dataReserva.getAll();
 	}
 
-	public LinkedList<Usuario> listarClientes() {
-		return usuarioService.listarClientes();
+	public LinkedList<Reserva> listarPorCliente(int idUsuario) {
+		return dataReserva.getByUsuario(idUsuario);
 	}
 
 	public LinkedList<Cancha> listarCanchas() {

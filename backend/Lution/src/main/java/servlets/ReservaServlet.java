@@ -1,6 +1,7 @@
 package servlets;
 
 import entities.Reserva;
+import entities.Usuario;
 import logic.ReservaService;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -25,7 +26,13 @@ public class ReservaServlet extends HttpServlet {
 
 			if (action == null) {
 
-				LinkedList<Reserva> lista = service.listar();
+				Usuario usuarioSesion = (Usuario) request.getSession().getAttribute("usuario");
+				LinkedList<Reserva> lista;
+				if ("Administrador".equals(usuarioSesion.getRol())) {
+					lista = service.listar();
+				} else {
+					lista = service.listarPorCliente(usuarioSesion.getIdUsuario());
+				}
 				request.setAttribute("listaReservas", lista);
 				if (error != null) {
 					request.setAttribute("error", error);
@@ -34,7 +41,6 @@ public class ReservaServlet extends HttpServlet {
 
 			} else if (action.equals("new")) {
 
-				request.setAttribute("listaClientes", service.listarClientes());
 				request.setAttribute("listaCanchas", service.listarCanchas());
 				if (error != null) {
 					request.setAttribute("error", error);

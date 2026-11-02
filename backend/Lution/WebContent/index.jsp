@@ -1,1 +1,1 @@
-<% response.sendRedirect("reserva"); %>
+<% response.sendRedirect("login"); %>

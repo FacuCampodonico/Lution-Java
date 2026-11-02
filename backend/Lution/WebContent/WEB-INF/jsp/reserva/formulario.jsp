@@ -1,7 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.LinkedList" %>
 <%@ page import="entities.Cancha" %>
-<%@ page import="entities.Usuario" %>
 
 <!DOCTYPE html>
 <html>
@@ -13,7 +12,6 @@
 </head>
 <body>
 <%@ include file="/WEB-INF/jsp/comun/menu.jspf" %>
-<% LinkedList<Usuario> listaClientes = (LinkedList<Usuario>) request.getAttribute("listaClientes"); %>
 <% LinkedList<Cancha> listaCanchas = (LinkedList<Cancha>) request.getAttribute("listaCanchas"); %>
 <% String error = (String) request.getAttribute("error"); %>
 <% if (error != null) { %>
@@ -21,13 +19,6 @@
 <% } %>
 
 <form action="ReservaProcesar" method="post">
-
-    <label class="form-label">Cliente:</label>
-    <select class="form-control" name="idUsuario" required>
-        <% for (Usuario u : listaClientes) { %>
-            <option value="<%= u.getIdUsuario() %>"><%= u.getApellido() + ", " + u.getNombre() %></option>
-        <% } %>
-    </select>
 
     <label class="form-label">Cancha:</label>
     <select class="form-control" name="idCancha" required>

@@ -77,6 +77,70 @@ public class DataReserva {
 		return reservas;
 	}
 
+	public LinkedList<Reserva> getByUsuario(int idUsuario) {
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		LinkedList<Reserva> reservas = new LinkedList<>();
+
+		try {
+			stmt = DbConnector.getInstancia().getConn().prepareStatement(
+					"SELECT r.idReserva, r.fecha, r.horaInicio, r.horaFin, u.idUsuario, u.nombre, u.apellido, "
+					+ "c.idCancha, c.numero, t.idTipoCancha, t.nombre AS nombreTipo, t.precio "
+					+ "FROM reserva r "
+					+ "JOIN usuario u ON u.idUsuario = r.idUsuario "
+					+ "JOIN cancha c ON c.idCancha = r.idCancha "
+					+ "JOIN tipo_cancha t ON t.idTipoCancha = c.idTipoCancha "
+					+ "WHERE r.idUsuario = ? "
+					+ "ORDER BY r.fecha DESC, r.horaInicio ");
+			stmt.setInt(1, idUsuario);
+			rs = stmt.executeQuery();
+
+			if (rs != null) {
+				while (rs.next()) {
+					Usuario cliente = new Usuario();
+					cliente.setIdUsuario(rs.getInt("idUsuario"));
+					cliente.setNombre(rs.getString("nombre"));
+					cliente.setApellido(rs.getString("apellido"));
+
+					TipoCancha tipoCancha = new TipoCancha();
+					tipoCancha.setIdTipoCancha(rs.getInt("idTipoCancha"));
+					tipoCancha.setNombre(rs.getString("nombreTipo"));
+					tipoCancha.setPrecio(rs.getDouble("precio"));
+
+					Cancha cancha = new Cancha();
+					cancha.setIdCancha(rs.getInt("idCancha"));
+					cancha.setNumero(rs.getInt("numero"));
+					cancha.setTipoCancha(tipoCancha);
+
+					Reserva reserva = new Reserva();
+					reserva.setIdReserva(rs.getInt("idReserva"));
+					reserva.setFecha(rs.getDate("fecha") != null ? rs.getDate("fecha").toLocalDate() : null);
+					reserva.setHoraInicio(rs.getInt("horaInicio"));
+					reserva.setHoraFin(rs.getInt("horaFin"));
+					reserva.setCliente(cliente);
+					reserva.setCancha(cancha);
+
+					reservas.add(reserva);
+				}
+			}
+
+		} catch (SQLException e) {
+			throw new RuntimeException("No se pudo obtener el listado de reservas del cliente.", e);
+
+		} finally {
+			try {
+				if (rs != null) { rs.close(); }
+				if (stmt != null) { stmt.close(); }
+				DbConnector.getInstancia().releaseConn();
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return reservas;
+	}
+
 	public LinkedList<Reserva> getByFecha(LocalDate fecha) {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;

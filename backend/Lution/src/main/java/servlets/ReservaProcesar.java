@@ -1,5 +1,6 @@
 package servlets;
 
+import entities.Usuario;
 import logic.ReservaService;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -19,7 +20,7 @@ public class ReservaProcesar extends HttpServlet {
 
 		try {
 
-			int idUsuario = Integer.parseInt(request.getParameter("idUsuario"));
+			int idUsuario = ((Usuario) request.getSession().getAttribute("usuario")).getIdUsuario();
 			int idCancha = Integer.parseInt(request.getParameter("idCancha"));
 			LocalDate fecha = LocalDate.parse(request.getParameter("fecha"));
 			int horaInicio = Integer.parseInt(request.getParameter("horaInicio"));

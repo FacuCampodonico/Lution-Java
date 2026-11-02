@@ -1,10 +1,20 @@
+<% entities.Usuario usuarioSesion = (entities.Usuario) session.getAttribute("usuario"); %>
 <nav class="navbar bg-light mb-3">
     <div class="container">
         <div>
-            <a href="tipoCancha" class="btn btn-link">Tipos de cancha</a>
-            <a href="horario" class="btn btn-link">Horarios</a>
-            <a href="cancha" class="btn btn-link">Canchas</a>
-            <a href="reserva" class="btn btn-link">Reservas</a>
+            <% if ("Administrador".equals(usuarioSesion.getRol())) { %>
+                <a href="tipoCancha" class="btn btn-link">Tipos de cancha</a>
+                <a href="horario" class="btn btn-link">Horarios</a>
+                <a href="cancha" class="btn btn-link">Canchas</a>
+                <a href="usuario" class="btn btn-link">Usuarios</a>
+                <a href="reserva" class="btn btn-link">Reservas</a>
+            <% } else { %>
+                <a href="reserva" class="btn btn-link">Mis reservas</a>
+            <% } %>
+        </div>
+        <div>
+            <span><%= usuarioSesion.getNombre() %> <%= usuarioSesion.getApellido() %> (<%= usuarioSesion.getRol() %>)</span>
+            <a href="logout" class="btn btn-outline-secondary btn-sm">Salir</a>
         </div>
     </div>
 </nav>
