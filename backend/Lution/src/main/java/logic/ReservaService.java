@@ -27,20 +27,12 @@ public class ReservaService {
 		return dataReserva.getByUsuario(idUsuario);
 	}
 
-	public LinkedList<Cancha> listarCanchas() {
-		return canchaService.listar();
-	}
-
 	public LinkedList<TipoCancha> listarTiposCancha() {
 		return tipoCanchaService.listar();
 	}
 
-	public Reserva reservar(int idUsuario, int idCancha, LocalDate fecha, int horaInicio) {
+	public Reserva prepararReserva(int idCancha, LocalDate fecha, int horaInicio) {
 
-		Usuario cliente = usuarioService.buscarPorId(idUsuario);
-		if (cliente == null) {
-			throw new IllegalArgumentException("El cliente seleccionado no existe.");
-		}
 		Cancha cancha = canchaService.buscarPorId(idCancha);
 		if (cancha == null) {
 			throw new IllegalArgumentException("La cancha seleccionada no existe.");
@@ -55,7 +47,19 @@ public class ReservaService {
 			throw new IllegalArgumentException(motivo);
 		}
 
-		return dataReserva.setReserva(new Reserva(cliente, cancha, fecha, horaInicio, horaFin));
+		return new Reserva(null, cancha, fecha, horaInicio, horaFin);
+	}
+
+	public Reserva reservar(int idUsuario, int idCancha, LocalDate fecha, int horaInicio) {
+
+		Reserva reserva = this.prepararReserva(idCancha, fecha, horaInicio);
+		Usuario cliente = usuarioService.buscarPorId(idUsuario);
+		if (cliente == null) {
+			throw new IllegalArgumentException("El cliente seleccionado no existe.");
+		}
+		reserva.setCliente(cliente);
+
+		return dataReserva.setReserva(reserva);
 	}
 
 	public LinkedList<Reserva> buscarDisponibles(LocalDate fecha, Integer idTipoCancha) {

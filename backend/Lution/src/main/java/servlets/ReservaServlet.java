@@ -4,6 +4,7 @@ import entities.Reserva;
 import entities.Usuario;
 import logic.ReservaService;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.LinkedList;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -41,11 +42,20 @@ public class ReservaServlet extends HttpServlet {
 
 			} else if (action.equals("new")) {
 
-				request.setAttribute("listaCanchas", service.listarCanchas());
-				if (error != null) {
-					request.setAttribute("error", error);
+				String fechaParam = request.getParameter("fecha");
+
+				try {
+
+					int idCancha = Integer.parseInt(request.getParameter("idCancha"));
+					int horaInicio = Integer.parseInt(request.getParameter("horaInicio"));
+					Reserva reserva = service.prepararReserva(idCancha, LocalDate.parse(fechaParam), horaInicio);
+					request.setAttribute("reserva", reserva);
+					request.getRequestDispatcher("/WEB-INF/jsp/reserva/formulario.jsp").forward(request, response);
+
+				} catch (RuntimeException e) {
+
+					response.sendRedirect("disponibilidad?fecha=" + fechaParam + "&error=" + ServletUtil.encodar(e.getMessage()));
 				}
-				request.getRequestDispatcher("/WEB-INF/jsp/reserva/formulario.jsp").forward(request, response);
 			}
 
 		} catch (RuntimeException e) {

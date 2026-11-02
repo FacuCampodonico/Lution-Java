@@ -17,6 +17,7 @@
 <% LinkedList<TipoCancha> listaTiposCancha = (LinkedList<TipoCancha>) request.getAttribute("listaTiposCancha"); %>
 <% String fechaFiltro = (String) request.getAttribute("fechaFiltro"); %>
 <% Integer idTipoCanchaFiltro = (Integer) request.getAttribute("idTipoCanchaFiltro"); %>
+<% boolean esCliente = "Cliente".equals(usuarioSesion.getRol()); %>
 <% String error = (String) request.getAttribute("error"); %>
 <% if (error != null) { %>
     <div class="alert alert-danger" role="alert"><%= error %></div>
@@ -49,10 +50,13 @@
     <th>Deporte</th>
     <th>Jugadores</th>
     <th>Precio</th>
+    <% if (esCliente) { %>
+        <th>Acciones</th>
+    <% } %>
 </tr>
 <% if (lista.isEmpty()) { %>
     <tr>
-        <td colspan="6">No hay turnos disponibles para los filtros elegidos.</td>
+        <td colspan="<%= esCliente ? 7 : 6 %>">No hay turnos disponibles para los filtros elegidos.</td>
     </tr>
 <% } %>
 <% for (Reserva r : lista) { %>
@@ -63,6 +67,11 @@
         <td><%= r.getCancha().getTipoCancha().getNombre() %></td>
         <td><%= r.getCancha().getTipoCancha().getCantMaxJugadores() %></td>
         <td><%= r.getCancha().getTipoCancha().getPrecio() %></td>
+        <% if (esCliente) { %>
+            <td>
+                <a href="reserva?action=new&idCancha=<%= r.getCancha().getIdCancha() %>&fecha=<%= r.getFecha() %>&horaInicio=<%= r.getHoraInicio() %>" class="btn btn-primary btn-sm">Reservar</a>
+            </td>
+        <% } %>
     </tr>
 <% } %>
 </table>

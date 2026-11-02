@@ -21,7 +21,7 @@
 <% } %>
 
 <% if (!esAdmin) { %>
-    <a href="reserva?action=new" class="btn btn-primary">Nueva Reserva</a>
+    <a href="disponibilidad" class="btn btn-primary">Buscar horarios disponibles</a>
 <% } %>
 <table class="table table-striped">
 <tr>

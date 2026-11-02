@@ -18,11 +18,13 @@ public class ReservaProcesar extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+		String fechaParam = request.getParameter("fecha");
+
 		try {
 
 			int idUsuario = ((Usuario) request.getSession().getAttribute("usuario")).getIdUsuario();
 			int idCancha = Integer.parseInt(request.getParameter("idCancha"));
-			LocalDate fecha = LocalDate.parse(request.getParameter("fecha"));
+			LocalDate fecha = LocalDate.parse(fechaParam);
 			int horaInicio = Integer.parseInt(request.getParameter("horaInicio"));
 
 			service.reservar(idUsuario, idCancha, fecha, horaInicio);
@@ -31,7 +33,7 @@ public class ReservaProcesar extends HttpServlet {
 
 		} catch (RuntimeException e) {
 
-			response.sendRedirect("reserva?action=new&error=" + ServletUtil.encodar(e.getMessage()));
+			response.sendRedirect("disponibilidad?fecha=" + fechaParam + "&error=" + ServletUtil.encodar(e.getMessage()));
 		}
 	}
 }
