@@ -6,6 +6,7 @@
                 <a href="tipoCancha" class="btn btn-link">Tipos de cancha</a>
                 <a href="horario" class="btn btn-link">Horarios</a>
                 <a href="cancha" class="btn btn-link">Canchas</a>
+                <a href="mantenimiento" class="btn btn-link">Mantenimientos</a>
                 <a href="usuario" class="btn btn-link">Usuarios</a>
                 <a href="reserva" class="btn btn-link">Reservas</a>
             <% } else { %>
