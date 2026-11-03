@@ -16,9 +16,13 @@ Lution es un sistema web cliente-servidor para la gestión de reservas en comple
 
 El flujo principal permite al cliente iniciar sesión, seleccionar un tipo de deporte y consultar la disponibilidad de las distintas canchas según sus horarios, evitando solapamientos entre reservas. El administrador gestiona los usuarios, los tipos de cancha, las canchas individuales, sus horarios disponibles y las tareas de mantenimiento que bloquean la disponibilidad.
 
-3. ## **Modelo de dominio**
+3. ## **Modelo de dominio y video de demo**
 
 ![Modelo de dominio](DER-Lution.png)
+
+Se adjunta el link de la demo del sistema
+
+https://drive.google.com/file/d/1hGB2EboDqF9w28CHHnN4wyoqaT8jsin8/view?usp=sharing
 
 4. ## **Casos de uso para Regularidad**
 
