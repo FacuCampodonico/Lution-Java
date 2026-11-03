@@ -45,10 +45,12 @@
             <th>Cliente</th>
         <% } %>
         <th>Precio</th>
+        <th>Estado</th>
+        <th>Acciones</th>
     </tr>
     <% if (lista.isEmpty()) { %>
         <tr>
-            <td colspan="<%= esAdmin ? 7 : 6 %>"><%= esAdmin ? "No hay reservas." : "No hay reservas para ese DNI." %></td>
+            <td colspan="<%= esAdmin ? 9 : 8 %>"><%= esAdmin ? "No hay reservas." : "No hay reservas para ese DNI." %></td>
         </tr>
     <% } %>
     <% for (Reserva r : lista) { %>
@@ -62,6 +64,35 @@
                 <td><%= r.getCliente().getApellido() + ", " + r.getCliente().getNombre() %></td>
             <% } %>
             <td><%= r.getCancha().getTipoCancha().getPrecio() %></td>
+            <td><%= r.getEstadoEtiqueta() %></td>
+            <td>
+                <% if ("CONFIRMADA".equals(r.getEstado()) && !r.isComenzada()) { %>
+                    <form action="ReservaProcesar" method="post" style="display:inline"
+                          onsubmit="return confirm('¿Estás seguro que querés cancelar la reserva N° <%= r.getIdReserva() %>?');">
+                        <input type="hidden" name="accion" value="cancelar">
+                        <input type="hidden" name="idReserva" value="<%= r.getIdReserva() %>">
+                        <% if (!esAdmin) { %>
+                            <input type="hidden" name="dni" value="<%= dniFiltro %>">
+                        <% } %>
+                        <button type="submit" class="btn btn-danger btn-sm">Cancelar</button>
+                    </form>
+                <% } %>
+                <% if (esAdmin && "CONFIRMADA".equals(r.getEstado()) && r.isFechaAlcanzada()) { %>
+                    <form action="ReservaProcesar" method="post" style="display:inline">
+                        <input type="hidden" name="accion" value="asistencia">
+                        <input type="hidden" name="idReserva" value="<%= r.getIdReserva() %>">
+                        <input type="hidden" name="asistio" value="true">
+                        <button type="submit" class="btn btn-success btn-sm">Asistió</button>
+                    </form>
+
+                    <form action="ReservaProcesar" method="post" style="display:inline">
+                        <input type="hidden" name="accion" value="asistencia">
+                        <input type="hidden" name="idReserva" value="<%= r.getIdReserva() %>">
+                        <input type="hidden" name="asistio" value="false">
+                        <button type="submit" class="btn btn-secondary btn-sm">No asistió</button>
+                    </form>
+                <% } %>
+            </td>
         </tr>
     <% } %>
     </table>

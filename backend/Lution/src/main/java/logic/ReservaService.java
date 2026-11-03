@@ -63,6 +63,51 @@ public class ReservaService {
 		return dataReserva.setReserva(reserva);
 	}
 
+	public void cancelarReserva(int idReserva) {
+
+		Reserva reserva = dataReserva.getById(idReserva);
+		if (reserva == null) {
+			throw new IllegalArgumentException("La reserva no existe.");
+		}
+		if (!"CONFIRMADA".equals(reserva.getEstado())) {
+			throw new IllegalArgumentException("Solo se pueden cancelar reservas confirmadas.");
+		}
+		if (reserva.isComenzada()) {
+			throw new IllegalArgumentException("No se puede cancelar una reserva cuyo turno ya comenzó.");
+		}
+
+		dataReserva.cancelar(idReserva);
+	}
+
+	public void cancelarReservaCliente(int idReserva, String dni) {
+
+		Reserva reserva = dataReserva.getById(idReserva);
+		if (reserva == null) {
+			throw new IllegalArgumentException("La reserva no existe.");
+		}
+		if (dni == null || !dni.trim().equals(reserva.getCliente().getDni())) {
+			throw new IllegalArgumentException("La reserva no pertenece al DNI ingresado.");
+		}
+
+		this.cancelarReserva(idReserva);
+	}
+
+	public void registrarAsistencia(int idReserva, boolean asistio) {
+
+		Reserva reserva = dataReserva.getById(idReserva);
+		if (reserva == null) {
+			throw new IllegalArgumentException("La reserva no existe.");
+		}
+		if (!"CONFIRMADA".equals(reserva.getEstado())) {
+			throw new IllegalArgumentException("Solo se puede registrar la asistencia de reservas confirmadas.");
+		}
+		if (!reserva.isFechaAlcanzada()) {
+			throw new IllegalArgumentException("No se puede registrar la asistencia antes del día de la reserva.");
+		}
+
+		dataReserva.registrarAsistencia(idReserva, asistio ? "ASISTIO" : "NO_ASISTIO");
+	}
+
 	public LinkedList<Reserva> buscarDisponibles(LocalDate fecha, Integer idTipoCancha) {
 
 		LinkedList<Reserva> turnos = new LinkedList<>();

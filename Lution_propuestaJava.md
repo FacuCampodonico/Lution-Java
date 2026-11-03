@@ -42,6 +42,7 @@ El flujo principal permite al cliente iniciar sesión, seleccionar un tipo de de
 |  | ABMC Cancha | Gestión de canchas; cada cancha depende de un Tipo de Cancha. |
 |  | ABMC Mantenimiento | Gestión de tareas de mantenimiento asociadas a una cancha. |
 | CU "Complejo" (nivel resumen) | Gestión de Reserva | La reserva ocurre en eventos diferenciados: el cliente consulta la disponibilidad, selecciona horario y confirma la reserva, verificando que no exista solapamiento ni mantenimiento programado. |
+| CU NO-ABMC | Cancelación de Reserva y Registro de Asistencia | El cliente o el administrador cancelan una reserva confirmada antes de que comience el turno, liberando el horario; una vez comenzado el turno, el administrador registra si el cliente asistió o no. |
 | Listado Complejo | Búsqueda de Horarios Disponibles | Listado de canchas y horarios que permite filtrar por tipo de deporte y/o fecha. |
 | Nivel de Acceso | Roles: Administrador / Cliente | Acceso diferenciado por rol: el cliente reserva canchas y el administrador gestiona usuarios, deportes, canchas, horarios y mantenimiento. |
 | Manejo de errores | Notificación de errores | Manejo de errores en todos los niveles mediante excepciones y bloques try-catch-finally. |

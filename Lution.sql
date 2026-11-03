@@ -71,8 +71,10 @@ CREATE TABLE `reserva` (
   `fecha` date NOT NULL,
   `horaInicio` int NOT NULL,
   `horaFin` int NOT NULL,
+  `estado` varchar(45) NOT NULL DEFAULT 'CONFIRMADA',
+  `activa` tinyint GENERATED ALWAYS AS (IF(`estado` = 'CANCELADA', NULL, 1)) VIRTUAL,
   PRIMARY KEY (`idReserva`),
-  UNIQUE KEY `reserva_UNIQUE` (`idCancha`,`fecha`,`horaInicio`),
+  UNIQUE KEY `reserva_UNIQUE` (`idCancha`,`fecha`,`horaInicio`,`activa`),
   KEY `fk_reserva_usuario` (`idUsuario`),
   CONSTRAINT `fk_reserva_usuario` FOREIGN KEY (`idUsuario`) REFERENCES `usuario` (`idUsuario`),
   CONSTRAINT `fk_reserva_cancha` FOREIGN KEY (`idCancha`) REFERENCES `cancha` (`idCancha`)

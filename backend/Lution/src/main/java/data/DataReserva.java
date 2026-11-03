@@ -23,7 +23,7 @@ public class DataReserva {
 		try {
 			stmt = DbConnector.getInstancia().getConn().createStatement();
 			rs = stmt.executeQuery(
-					"SELECT r.idReserva, r.fecha, r.horaInicio, r.horaFin, u.idUsuario, u.nombre, u.apellido, "
+					"SELECT r.idReserva, r.fecha, r.horaInicio, r.horaFin, r.estado, u.idUsuario, u.nombre, u.apellido, "
 					+ "c.idCancha, c.numero, t.idTipoCancha, t.nombre AS nombreTipo, t.precio "
 					+ "FROM reserva r "
 					+ "JOIN usuario u ON u.idUsuario = r.idUsuario "
@@ -53,6 +53,7 @@ public class DataReserva {
 					reserva.setFecha(rs.getDate("fecha") != null ? rs.getDate("fecha").toLocalDate() : null);
 					reserva.setHoraInicio(rs.getInt("horaInicio"));
 					reserva.setHoraFin(rs.getInt("horaFin"));
+					reserva.setEstado(rs.getString("estado"));
 					reserva.setCliente(cliente);
 					reserva.setCancha(cancha);
 
@@ -77,6 +78,60 @@ public class DataReserva {
 		return reservas;
 	}
 
+	public Reserva getById(int idReserva) {
+		Reserva reserva = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+
+		try {
+			stmt = DbConnector.getInstancia().getConn().prepareStatement(
+					"SELECT r.idReserva, r.fecha, r.horaInicio, r.horaFin, r.estado, u.idUsuario, u.dni, u.nombre, u.apellido, "
+					+ "c.idCancha, c.numero "
+					+ "FROM reserva r "
+					+ "JOIN usuario u ON u.idUsuario = r.idUsuario "
+					+ "JOIN cancha c ON c.idCancha = r.idCancha "
+					+ "WHERE r.idReserva = ? ");
+			stmt.setInt(1, idReserva);
+			rs = stmt.executeQuery();
+
+			if (rs != null && rs.next()) {
+				Usuario cliente = new Usuario();
+				cliente.setIdUsuario(rs.getInt("idUsuario"));
+				cliente.setDni(rs.getString("dni"));
+				cliente.setNombre(rs.getString("nombre"));
+				cliente.setApellido(rs.getString("apellido"));
+
+				Cancha cancha = new Cancha();
+				cancha.setIdCancha(rs.getInt("idCancha"));
+				cancha.setNumero(rs.getInt("numero"));
+
+				reserva = new Reserva();
+				reserva.setIdReserva(rs.getInt("idReserva"));
+				reserva.setFecha(rs.getDate("fecha") != null ? rs.getDate("fecha").toLocalDate() : null);
+				reserva.setHoraInicio(rs.getInt("horaInicio"));
+				reserva.setHoraFin(rs.getInt("horaFin"));
+				reserva.setEstado(rs.getString("estado"));
+				reserva.setCliente(cliente);
+				reserva.setCancha(cancha);
+			}
+
+		} catch (SQLException e) {
+			throw new RuntimeException("No se pudo obtener la reserva solicitada.", e);
+
+		} finally {
+			try {
+				if (rs != null) { rs.close(); }
+				if (stmt != null) { stmt.close(); }
+				DbConnector.getInstancia().releaseConn();
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return reserva;
+	}
+
 	public LinkedList<Reserva> getByUsuario(int idUsuario) {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -84,7 +139,7 @@ public class DataReserva {
 
 		try {
 			stmt = DbConnector.getInstancia().getConn().prepareStatement(
-					"SELECT r.idReserva, r.fecha, r.horaInicio, r.horaFin, u.idUsuario, u.nombre, u.apellido, "
+					"SELECT r.idReserva, r.fecha, r.horaInicio, r.horaFin, r.estado, u.idUsuario, u.nombre, u.apellido, "
 					+ "c.idCancha, c.numero, t.idTipoCancha, t.nombre AS nombreTipo, t.precio "
 					+ "FROM reserva r "
 					+ "JOIN usuario u ON u.idUsuario = r.idUsuario "
@@ -117,6 +172,7 @@ public class DataReserva {
 					reserva.setFecha(rs.getDate("fecha") != null ? rs.getDate("fecha").toLocalDate() : null);
 					reserva.setHoraInicio(rs.getInt("horaInicio"));
 					reserva.setHoraFin(rs.getInt("horaFin"));
+					reserva.setEstado(rs.getString("estado"));
 					reserva.setCliente(cliente);
 					reserva.setCancha(cancha);
 
@@ -149,7 +205,7 @@ public class DataReserva {
 		try {
 			stmt = DbConnector.getInstancia().getConn().prepareStatement(
 					"SELECT idReserva, idCancha, horaInicio, horaFin "
-					+ "FROM reserva WHERE fecha = ? ");
+					+ "FROM reserva WHERE fecha = ? AND estado <> 'CANCELADA' ");
 			stmt.setDate(1, Date.valueOf(fecha));
 			rs = stmt.executeQuery();
 
@@ -192,14 +248,15 @@ public class DataReserva {
 
 		try {
 			stmt = DbConnector.getInstancia().getConn().prepareStatement(
-					"INSERT INTO reserva (idUsuario, idCancha, fecha, horaInicio, horaFin) "
-					+ "VALUES (?, ?, ?, ?, ?)",
+					"INSERT INTO reserva (idUsuario, idCancha, fecha, horaInicio, horaFin, estado) "
+					+ "VALUES (?, ?, ?, ?, ?, ?)",
 					Statement.RETURN_GENERATED_KEYS);
 			stmt.setInt(1, reserva.getCliente().getIdUsuario());
 			stmt.setInt(2, reserva.getCancha().getIdCancha());
 			stmt.setDate(3, Date.valueOf(reserva.getFecha()));
 			stmt.setInt(4, reserva.getHoraInicio());
 			stmt.setInt(5, reserva.getHoraFin());
+			stmt.setString(6, reserva.getEstado());
 
 			stmt.executeUpdate();
 
@@ -227,6 +284,63 @@ public class DataReserva {
 		}
 
 		return reserva;
+	}
+
+	public void cancelar(int idReserva) {
+		PreparedStatement stmt = null;
+
+		try {
+			stmt = DbConnector.getInstancia().getConn().prepareStatement(
+					"UPDATE reserva SET estado = 'CANCELADA' "
+					+ "WHERE idReserva = ? AND estado = 'CONFIRMADA'");
+			stmt.setInt(1, idReserva);
+			int filasAfectadas = stmt.executeUpdate();
+
+			if (filasAfectadas == 0) {
+				throw new RuntimeException("No se pudo cancelar la reserva: no existe o no está confirmada.");
+			}
+
+		} catch (SQLException e) {
+			throw new RuntimeException("No se pudo cancelar la reserva.", e);
+
+		} finally {
+			try {
+				if (stmt != null) { stmt.close(); }
+				DbConnector.getInstancia().releaseConn();
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void registrarAsistencia(int idReserva, String estado) {
+		PreparedStatement stmt = null;
+
+		try {
+			stmt = DbConnector.getInstancia().getConn().prepareStatement(
+					"UPDATE reserva SET estado = ? "
+					+ "WHERE idReserva = ? AND estado = 'CONFIRMADA'");
+			stmt.setString(1, estado);
+			stmt.setInt(2, idReserva);
+			int filasAfectadas = stmt.executeUpdate();
+
+			if (filasAfectadas == 0) {
+				throw new RuntimeException("No se pudo registrar la asistencia: la reserva no existe o no está confirmada.");
+			}
+
+		} catch (SQLException e) {
+			throw new RuntimeException("No se pudo registrar la asistencia de la reserva.", e);
+
+		} finally {
+			try {
+				if (stmt != null) { stmt.close(); }
+				DbConnector.getInstancia().releaseConn();
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 }

@@ -1,6 +1,7 @@
 package entities;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class Reserva {
 	private int idReserva;
@@ -9,6 +10,7 @@ public class Reserva {
 	private LocalDate fecha;
 	private int horaInicio;
 	private int horaFin;
+	private String estado;
 
 	public int getIdReserva() {
 		return idReserva;
@@ -58,6 +60,34 @@ public class Reserva {
 		this.horaFin = horaFin;
 	}
 
+	public String getEstado() {
+		return estado;
+	}
+
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
+
+	public boolean isComenzada() {
+		return this.getFecha().isBefore(LocalDate.now())
+				|| (this.getFecha().equals(LocalDate.now()) && this.getHoraInicio() <= LocalTime.now().getHour());
+	}
+
+	public boolean isFechaAlcanzada() {
+		return !this.getFecha().isAfter(LocalDate.now());
+	}
+
+	public String getEstadoEtiqueta() {
+		if ("CANCELADA".equals(this.getEstado())) {
+			return "Cancelada";
+		} else if ("ASISTIO".equals(this.getEstado())) {
+			return "Asistió";
+		} else if ("NO_ASISTIO".equals(this.getEstado())) {
+			return "No asistió";
+		}
+		return "Confirmada";
+	}
+
 	public Reserva() {
 	}
 
@@ -67,5 +97,6 @@ public class Reserva {
 		this.fecha = fecha;
 		this.horaInicio = horaInicio;
 		this.horaFin = horaFin;
+		this.estado = "CONFIRMADA";
 	}
 }
