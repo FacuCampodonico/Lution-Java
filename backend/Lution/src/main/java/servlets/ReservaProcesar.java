@@ -1,6 +1,5 @@
 package servlets;
 
-import entities.Usuario;
 import logic.ReservaService;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -18,22 +17,27 @@ public class ReservaProcesar extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+		String idCanchaParam = request.getParameter("idCancha");
 		String fechaParam = request.getParameter("fecha");
+		String horaInicioParam = request.getParameter("horaInicio");
 
 		try {
 
-			int idUsuario = ((Usuario) request.getSession().getAttribute("usuario")).getIdUsuario();
-			int idCancha = Integer.parseInt(request.getParameter("idCancha"));
+			String dni = request.getParameter("dni");
+			String nombre = request.getParameter("nombre");
+			String apellido = request.getParameter("apellido");
+			int idCancha = Integer.parseInt(idCanchaParam);
 			LocalDate fecha = LocalDate.parse(fechaParam);
-			int horaInicio = Integer.parseInt(request.getParameter("horaInicio"));
+			int horaInicio = Integer.parseInt(horaInicioParam);
 
-			service.reservar(idUsuario, idCancha, fecha, horaInicio);
+			service.reservar(dni, nombre, apellido, idCancha, fecha, horaInicio);
 
-			response.sendRedirect("reserva");
+			response.sendRedirect("reserva?dni=" + ServletUtil.encodar(dni.trim()));
 
 		} catch (RuntimeException e) {
 
-			response.sendRedirect("disponibilidad?fecha=" + fechaParam + "&error=" + ServletUtil.encodar(e.getMessage()));
+			response.sendRedirect("reserva?action=new&idCancha=" + idCanchaParam + "&fecha=" + fechaParam
+					+ "&horaInicio=" + horaInicioParam + "&error=" + ServletUtil.encodar(e.getMessage()));
 		}
 	}
 }

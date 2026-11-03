@@ -2,7 +2,7 @@
 <nav class="navbar bg-light mb-3">
     <div class="container">
         <div>
-            <% if ("Administrador".equals(usuarioSesion.getRol())) { %>
+            <% if (usuarioSesion != null && "Administrador".equals(usuarioSesion.getRol())) { %>
                 <a href="tipoCancha" class="btn btn-link">Tipos de cancha</a>
                 <a href="horario" class="btn btn-link">Horarios</a>
                 <a href="cancha" class="btn btn-link">Canchas</a>
@@ -15,8 +15,12 @@
             <a href="disponibilidad" class="btn btn-link">Horarios disponibles</a>
         </div>
         <div>
-            <span><%= usuarioSesion.getNombre() %> <%= usuarioSesion.getApellido() %> (<%= usuarioSesion.getRol() %>)</span>
-            <a href="logout" class="btn btn-outline-secondary btn-sm">Salir</a>
+            <% if (usuarioSesion != null) { %>
+                <span><%= usuarioSesion.getNombre() %> <%= usuarioSesion.getApellido() %> (<%= usuarioSesion.getRol() %>)</span>
+                <a href="logout" class="btn btn-outline-secondary btn-sm">Salir</a>
+            <% } else { %>
+                <a href="login" class="btn btn-outline-primary btn-sm">Ingresar</a>
+            <% } %>
         </div>
     </div>
 </nav>

@@ -1,1 +1,1 @@
-<% response.sendRedirect("login"); %>
+<% response.sendRedirect("disponibilidad"); %>

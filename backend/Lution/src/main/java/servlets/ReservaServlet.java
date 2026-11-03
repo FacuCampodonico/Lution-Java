@@ -28,11 +28,15 @@ public class ReservaServlet extends HttpServlet {
 			if (action == null) {
 
 				Usuario usuarioSesion = (Usuario) request.getSession().getAttribute("usuario");
+				String dni = request.getParameter("dni");
 				LinkedList<Reserva> lista;
-				if ("Administrador".equals(usuarioSesion.getRol())) {
+				if (usuarioSesion != null && "Administrador".equals(usuarioSesion.getRol())) {
 					lista = service.listar();
+				} else if (dni != null && !dni.trim().isEmpty()) {
+					lista = service.listarPorDni(dni.trim());
+					request.setAttribute("dniFiltro", dni.trim());
 				} else {
-					lista = service.listarPorCliente(usuarioSesion.getIdUsuario());
+					lista = new LinkedList<>();
 				}
 				request.setAttribute("listaReservas", lista);
 				if (error != null) {
@@ -50,6 +54,9 @@ public class ReservaServlet extends HttpServlet {
 					int horaInicio = Integer.parseInt(request.getParameter("horaInicio"));
 					Reserva reserva = service.prepararReserva(idCancha, LocalDate.parse(fechaParam), horaInicio);
 					request.setAttribute("reserva", reserva);
+					if (error != null) {
+						request.setAttribute("error", error);
+					}
 					request.getRequestDispatcher("/WEB-INF/jsp/reserva/formulario.jsp").forward(request, response);
 
 				} catch (RuntimeException e) {

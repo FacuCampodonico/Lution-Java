@@ -16,7 +16,7 @@ CREATE TABLE `usuario` (
   `dni` varchar(20) NOT NULL,
   `nombre` varchar(100) NOT NULL,
   `apellido` varchar(100) NOT NULL,
-  `password` varchar(100) NOT NULL,
+  `password` varchar(100) DEFAULT NULL,
   `rol` varchar(45) NOT NULL,
   PRIMARY KEY (`idUsuario`),
   UNIQUE KEY `dni_UNIQUE` (`dni`)
@@ -80,7 +80,7 @@ CREATE TABLE `reserva` (
 
 INSERT INTO `usuario` (`dni`, `nombre`, `apellido`, `password`, `rol`) VALUES
   ('11111111', 'Admin', 'Lution', 'admin', 'Administrador'),
-  ('22222222', 'Cliente', 'Prueba', 'cliente', 'Cliente');
+  ('22222222', 'Cliente', 'Prueba', NULL, 'Cliente');
 
 INSERT INTO `tipo_cancha` (`nombre`, `descripcion`, `cantMaxJugadores`, `precio`) VALUES
   ('Fútbol 5', 'Césped sintético', 10, 30000),

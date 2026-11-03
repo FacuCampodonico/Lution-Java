@@ -28,6 +28,7 @@
     <input type="password" class="form-control" name="password" required>
 
     <button type="submit" class="btn btn-primary">Ingresar</button>
+    <a href="disponibilidad" class="btn btn-secondary">Volver</a>
 </form>
 
 </div>

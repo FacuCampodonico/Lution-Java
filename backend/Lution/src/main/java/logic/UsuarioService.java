@@ -31,11 +31,14 @@ public class UsuarioService {
 		if (apellido == null || apellido.trim().isEmpty()) {
 			throw new IllegalArgumentException("El apellido es obligatorio.");
 		}
-		if (password == null || password.trim().isEmpty()) {
-			throw new IllegalArgumentException("La contraseña es obligatoria.");
-		}
 		if (!"Administrador".equals(rol) && !"Cliente".equals(rol)) {
 			throw new IllegalArgumentException("El rol debe ser Administrador o Cliente.");
+		}
+		if ("Administrador".equals(rol) && (password == null || password.trim().isEmpty())) {
+			throw new IllegalArgumentException("La contraseña es obligatoria.");
+		}
+		if (password != null && password.trim().isEmpty()) {
+			password = null;
 		}
 
 		if (id == null || id.isEmpty()) {
@@ -65,6 +68,41 @@ public class UsuarioService {
 			throw new IllegalArgumentException("El usuario solicitado no existe.");
 		}
 		dataUsuario.deleteById(usuario);
+	}
+
+	public Usuario buscarPorDni(String dni) {
+		return dataUsuario.getByDni(dni);
+	}
+
+	public Usuario buscarOCrearCliente(String dni, String nombre, String apellido) {
+
+		if (dni == null || dni.trim().isEmpty()) {
+			throw new IllegalArgumentException("El DNI es obligatorio.");
+		}
+		if (nombre == null || nombre.trim().isEmpty()) {
+			throw new IllegalArgumentException("El nombre es obligatorio.");
+		}
+		if (apellido == null || apellido.trim().isEmpty()) {
+			throw new IllegalArgumentException("El apellido es obligatorio.");
+		}
+
+		Usuario existente = dataUsuario.getByDni(dni.trim());
+
+		if (existente == null) {
+
+			Usuario nuevo = new Usuario(dni.trim(), nombre, apellido, null, "Cliente");
+			return dataUsuario.setUsuario(nuevo);
+
+		} else {
+
+			if (!"Cliente".equals(existente.getRol())) {
+				throw new IllegalArgumentException("El DNI ingresado pertenece a un administrador.");
+			}
+			existente.setNombre(nombre);
+			existente.setApellido(apellido);
+			dataUsuario.updateById(existente);
+			return existente;
+		}
 	}
 
 	public Usuario autenticar(String dni, String password) {

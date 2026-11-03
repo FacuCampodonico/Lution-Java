@@ -26,8 +26,8 @@
     <label class="form-label">Apellido:</label>
     <input type="text" class="form-control" name="apellido" required value="<%= (usuario != null) ? usuario.getApellido() : "" %>">
 
-    <label class="form-label">Contraseña:</label>
-    <input type="password" class="form-control" name="password" required>
+    <label class="form-label">Contraseña (solo administradores):</label>
+    <input type="password" class="form-control" name="password">
 
     <label class="form-label">Rol:</label>
     <select class="form-control" name="rol" required>

@@ -23,8 +23,12 @@ public class ReservaService {
 		return dataReserva.getAll();
 	}
 
-	public LinkedList<Reserva> listarPorCliente(int idUsuario) {
-		return dataReserva.getByUsuario(idUsuario);
+	public LinkedList<Reserva> listarPorDni(String dni) {
+		Usuario cliente = usuarioService.buscarPorDni(dni);
+		if (cliente == null) {
+			return new LinkedList<>();
+		}
+		return dataReserva.getByUsuario(cliente.getIdUsuario());
 	}
 
 	public LinkedList<TipoCancha> listarTiposCancha() {
@@ -50,13 +54,10 @@ public class ReservaService {
 		return new Reserva(null, cancha, fecha, horaInicio, horaFin);
 	}
 
-	public Reserva reservar(int idUsuario, int idCancha, LocalDate fecha, int horaInicio) {
+	public Reserva reservar(String dni, String nombre, String apellido, int idCancha, LocalDate fecha, int horaInicio) {
 
 		Reserva reserva = this.prepararReserva(idCancha, fecha, horaInicio);
-		Usuario cliente = usuarioService.buscarPorId(idUsuario);
-		if (cliente == null) {
-			throw new IllegalArgumentException("El cliente seleccionado no existe.");
-		}
+		Usuario cliente = usuarioService.buscarOCrearCliente(dni, nombre, apellido);
 		reserva.setCliente(cliente);
 
 		return dataReserva.setReserva(reserva);

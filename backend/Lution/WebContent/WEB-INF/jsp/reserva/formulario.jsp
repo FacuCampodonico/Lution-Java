@@ -14,8 +14,13 @@
 <div class="container mt-4">
 
 <% Reserva reserva = (Reserva) request.getAttribute("reserva"); %>
+<% String error = (String) request.getAttribute("error"); %>
 
 <h2>Confirmar Reserva</h2>
+
+<% if (error != null) { %>
+    <div class="alert alert-danger" role="alert"><%= error %></div>
+<% } %>
 
 <table class="table">
     <tr>
@@ -45,6 +50,15 @@
     <input type="hidden" name="idCancha" value="<%= reserva.getCancha().getIdCancha() %>">
     <input type="hidden" name="fecha" value="<%= reserva.getFecha() %>">
     <input type="hidden" name="horaInicio" value="<%= reserva.getHoraInicio() %>">
+
+    <label class="form-label">Nombre:</label>
+    <input type="text" class="form-control" name="nombre" required>
+
+    <label class="form-label">Apellido:</label>
+    <input type="text" class="form-control" name="apellido" required>
+
+    <label class="form-label">DNI:</label>
+    <input type="text" class="form-control mb-3" name="dni" required>
 
     <button type="submit" class="btn btn-success">Confirmar reserva</button>
     <a href="disponibilidad?fecha=<%= reserva.getFecha() %>" class="btn btn-secondary">Volver</a>

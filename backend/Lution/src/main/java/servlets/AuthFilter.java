@@ -17,6 +17,12 @@ import javax.servlet.http.HttpSession;
 @WebFilter("/*")
 public class AuthFilter implements Filter {
 
+	private static final List<String> RUTAS_PUBLICAS = Arrays.asList(
+			"/login", "/LoginProcesar",
+			"/disponibilidad",
+			"/reserva", "/ReservaProcesar",
+			"/index.jsp");
+
 	private static final List<String> RUTAS_ADMIN = Arrays.asList(
 			"/usuario", "/UsuarioProcesar",
 			"/tipoCancha", "/TipoCanchaProcesar",
@@ -24,15 +30,13 @@ public class AuthFilter implements Filter {
 			"/cancha", "/CanchaProcesar",
 			"/mantenimiento", "/MantenimientoProcesar");
 
-	private static final List<String> RUTAS_CLIENTE = Arrays.asList("/ReservaProcesar");
-
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
 
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) res;
 		String ruta = request.getServletPath();
 
-		if (ruta.equals("/login") || ruta.equals("/LoginProcesar")) {
+		if (RUTAS_PUBLICAS.contains(ruta)) {
 			chain.doFilter(request, response);
 			return;
 		}
@@ -44,9 +48,6 @@ public class AuthFilter implements Filter {
 			response.sendRedirect(request.getContextPath() + "/login");
 
 		} else if (RUTAS_ADMIN.contains(ruta) && !"Administrador".equals(usuario.getRol())) {
-			response.sendError(HttpServletResponse.SC_FORBIDDEN);
-
-		} else if (RUTAS_CLIENTE.contains(ruta) && !"Cliente".equals(usuario.getRol())) {
 			response.sendError(HttpServletResponse.SC_FORBIDDEN);
 
 		} else {

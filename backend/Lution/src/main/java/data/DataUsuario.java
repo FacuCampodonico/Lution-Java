@@ -131,6 +131,44 @@ public class DataUsuario {
 		return usuario;
 	}
 
+	public Usuario getByDni(String dni) {
+		Usuario usuario = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+
+		try {
+			stmt = DbConnector.getInstancia().getConn().prepareStatement(
+					"SELECT idUsuario, dni, nombre, apellido, rol "
+					+ "FROM usuario WHERE dni = ? ");
+			stmt.setString(1, dni);
+			rs = stmt.executeQuery();
+
+			if (rs != null && rs.next()) {
+				usuario = new Usuario();
+				usuario.setIdUsuario(rs.getInt("idUsuario"));
+				usuario.setDni(rs.getString("dni"));
+				usuario.setNombre(rs.getString("nombre"));
+				usuario.setApellido(rs.getString("apellido"));
+				usuario.setRol(rs.getString("rol"));
+			}
+
+		} catch (SQLException e) {
+			throw new RuntimeException("No se pudo obtener el usuario solicitado.", e);
+
+		} finally {
+			try {
+				if (rs != null) { rs.close(); }
+				if (stmt != null) { stmt.close(); }
+				DbConnector.getInstancia().releaseConn();
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return usuario;
+	}
+
 	public Usuario getByDniYPassword(String dni, String password) {
 		Usuario usuario = null;
 		PreparedStatement stmt = null;
@@ -139,7 +177,7 @@ public class DataUsuario {
 		try {
 			stmt = DbConnector.getInstancia().getConn().prepareStatement(
 					"SELECT idUsuario, dni, nombre, apellido, rol "
-					+ "FROM usuario WHERE dni = ? AND password = ? ");
+					+ "FROM usuario WHERE dni = ? AND password = ? AND rol = 'Administrador' ");
 			stmt.setString(1, dni);
 			stmt.setString(2, password);
 			rs = stmt.executeQuery();
